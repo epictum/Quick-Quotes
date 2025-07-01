@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Quote - Version 11</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 8px 8px 40px;
+      font-size: 14px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.2s ease;
+    }
+     .pin-icon {
+      position: absolute;
+      left: 8px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+      /* Separate SVG rotation from the container */
+    .pin-icon svg {
+      transition: transform 0.2s ease;
+    }
+    
+    .pin-icon.unpinned {
+      color: #757575;
+    }
+    
+    .pin-icon.unpinned svg {
+      transform: rotate(-45deg) translateY(-2px);
+    }
+    
+    .pin-icon.pinned {
+      color: #007BFF;
+    }
+    
+    .pin-icon.pinned svg {
+      transform: rotate(0deg) translateY(1px);
+    }
+    
+    .pin-icon:hover {
+      color: #0056b3;
+    }
+    
+    /* Updated tooltip styles */
+
+    .pin-icon::after {
+      content: "Keep Fixed";
+      position: absolute;
+      left: 0px;
+      top: -50%;
+      transform: translateY(-50%);
+      background-color: #333;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      /* Ensure tooltip stays straight */
+      transform-origin: left center;
+    }
+    
+    .pin-icon:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    button {
+      width: 48%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .reset {
+      background-color: #FF0000;
+      width: 100%;
+      margin: 20px 0;
+    }
+    button.reset:hover {
+      background-color: #cc0000;
+    }
+    .result-container {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .result {
+      font-size: 24px;
+      line-height: 1.4;
+      color: #212529;
+      text-align: center;
+    }
+    .value {
+      color: #007BFF;
+      font-weight: bold;
+    }
+
+    @keyframes flash-border {
+      0% { border-color: #ccc; }
+      25% { border-color: #000; }
+      50% { border-color: #ccc; }
+      75% { border-color: #000; }
+      100% { border-color: #ccc; }
+    }
+
+    .flash-animation {
+      animation: flash-border 600ms ease;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quick Quote</h1>
+    <form id="adtechCalculator">
+      <div class="form-group">
+        <label for="impressions">Impressions</label>
+        <div class="input-container">
+          <div class="pin-icon unpinned" id="pin-impressions" onclick="togglePin('impressions')">
+            <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="PushPinIcon">
+              <path fill="currentColor" fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3"></path>
+            </svg>
+          </div>
+          <input type="number" id="impressions" placeholder="Enter Impressions" oninput="handleInputChange('impressions')">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cpm">CPM (Cost per Mille in $)</label>
+        <div class="input-container">
+          <div class="pin-icon unpinned" id="pin-cpm" onclick="togglePin('cpm')">
+            <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="PushPinIcon">
+              <path fill="currentColor" fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3"></path>
+            </svg>
+          </div>
+          <input type="number" id="cpm" placeholder="Enter CPM" oninput="handleInputChange('cpm')">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="duration">Duration (in months)</label>
+        <div class="input-container">
+          <div class="pin-icon unpinned" id="pin-duration" onclick="togglePin('duration')">
+            <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="PushPinIcon">
+              <path fill="currentColor" fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3"></path>
+            </svg>
+          </div>
+          <input type="number" id="duration" placeholder="Enter Duration" oninput="handleInputChange('duration')">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="budget">Total Budget ($)</label>
+        <div class="input-container">
+          <div class="pin-icon unpinned" id="pin-budget" onclick="togglePin('budget')">
+            <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="PushPinIcon">
+              <path fill="currentColor" fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3"></path>
+            </svg>
+          </div>
+          <input type="number" id="budget" placeholder="Enter Total Budget" oninput="handleInputChange('budget')">
+        </div>
+      </div>
+    </form>
+    
+    <div class="result-container">
+      <div id="result" class="result"></div>
+    </div>
+
+    <button type="button" class="reset" onclick="resetFields()">Reset</button>
+  </div>
+
+  <script>
+    let initialFieldPopulated = false;
+
+    function togglePin(fieldId) {
+      const pinIcon = document.getElementById(`pin-${fieldId}`);
+      const isCurrentlyPinned = pinIcon.classList.contains('pinned');
+      
+      if (!isCurrentlyPinned) {
+        const pinnedCount = document.querySelectorAll('.pin-icon.pinned').length;
+        if (pinnedCount >= 3) {
+          alert('Only three fields can be pinned at a time.');
+          return;
+        }
+      }
+
+      pinIcon.classList.toggle('pinned');
+      pinIcon.classList.toggle('unpinned');
+    }
+
+    function handleInputChange(fieldId) {
+      const impressionsInput = document.getElementById('impressions');
+      const cpmInput = document.getElementById('cpm');
+      const durationInput = document.getElementById('duration');
+      const budgetInput = document.getElementById('budget');
+
+      const impressions = parseFloat(impressionsInput.value) || 0;
+      const cpm = parseFloat(cpmInput.value) || 0;
+      const duration = parseFloat(durationInput.value) || 0;
+      const budget = parseFloat(budgetInput.value) || 0;
+
+      if (!initialFieldPopulated) {
+        initialFieldPopulated = true;
+        if (fieldId === 'impressions') {
+          setPinState({ impressions: true, cpm: true, duration: true, budget: false });
+        } else if (fieldId === 'budget') {
+          setPinState({ impressions: false, cpm: true, duration: true, budget: true });
+        }
+      }
+
+      calculateValues(fieldId, impressions, cpm, duration, budget);
+    }
+
+    function calculateValues(changedField, impressions, cpm, duration, budget) {
+      const impressionsPinned = isPinned('impressions');
+      const cpmPinned = isPinned('cpm');
+      const durationPinned = isPinned('duration');
+      const budgetPinned = isPinned('budget');
+
+      ['impressions', 'cpm', 'duration', 'budget'].forEach(id => {
+        document.getElementById(id).classList.remove('flash-animation');
+      });
+
+      if (!impressionsPinned && cpm && duration && budget) {
+        impressions = (budget * 1000) / (cpm * duration);
+        const input = document.getElementById('impressions');
+        input.value = Math.floor(impressions);
+        triggerAnimation(input);
+      }
+
+      if (!cpmPinned && impressions && duration && budget) {
+        cpm = (budget * 1000) / (impressions * duration);
+        const input = document.getElementById('cpm');
+        input.value = cpm.toFixed(2);
+        triggerAnimation(input);
+      }
+
+      if (!durationPinned && impressions && cpm && budget) {
+        duration = (budget * 1000) / (impressions * cpm);
+        const input = document.getElementById('duration');
+        input.value = Math.floor(duration);
+        triggerAnimation(input);
+      }
+
+      if (!budgetPinned && impressions && cpm && duration) {
+        budget = (impressions * cpm * duration) / 1000;
+        const input = document.getElementById('budget');
+        input.value = budget.toFixed(2);
+        triggerAnimation(input);
+      }
+
+      displayResult(impressions, cpm, duration, budget);
+    }
+
+    function triggerAnimation(element) {
+      element.classList.remove('flash-animation');
+      void element.offsetWidth;
+      element.classList.add('flash-animation');
+    }
+
+    function isPinned(fieldId) {
+      return document.getElementById(`pin-${fieldId}`).classList.contains('pinned');
+    }
+
+    function setPinState(state) {
+      Object.keys(state).forEach(fieldId => {
+        const pinIcon = document.getElementById(`pin-${fieldId}`);
+        if (state[fieldId]) {
+          pinIcon.classList.add('pinned');
+          pinIcon.classList.remove('unpinned');
+        } else {
+          pinIcon.classList.add('unpinned');
+          pinIcon.classList.remove('pinned');
+        }
+      });
+    }
+
+    function resetFields() {
+      initialFieldPopulated = false;
+      ['impressions', 'cpm', 'duration', 'budget'].forEach(id => {
+        document.getElementById(id).value = '';
+        const pinIcon = document.getElementById(`pin-${id}`);
+        pinIcon.classList.remove('pinned');
+        pinIcon.classList.add('unpinned');
+      });
+      document.getElementById('result').textContent = '';
+    }
+
+      function displayResult(impressions, cpm, duration, budget) {
+    if (impressions && cpm && duration && budget) {
+      const formattedImpressions = Math.floor(impressions).toLocaleString();
+      const formattedCPM = cpm.toFixed(2);
+      const formattedDuration = Math.floor(duration);
+      const formattedBudget = budget.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      
+      const resultHTML = `Your ads will be seen <span class="value">${formattedImpressions}</span> times for <span class="value">${formattedDuration}</span> months at a CPM rate of <span class="value">$${formattedCPM}</span>, which will cost a total of <span class="value">$${formattedBudget}</span>.`;
+      
+      document.getElementById('result').innerHTML = resultHTML;
+    } else {
+      document.getElementById('result').textContent = '';
+    }
+  }
+  </script>
+</body>
+</html>
